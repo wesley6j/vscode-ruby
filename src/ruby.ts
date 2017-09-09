@@ -21,12 +21,12 @@ export function activate(context: ExtensionContext) {
 		wordPattern: /(-?\d+(?:\.\d+))|(:?[A-Za-z][^-`~@#%^&()=+[{}|;:'",<>/.*\]\s\\!?]*[!?]?)/
 	});
 
-	registerHighlightProvider(context);
+	// registerHighlightProvider(context);
 	registerLinters(context);
-	registerCompletionProvider(context);
-	registerFormatter(context);
-	registerIntellisenseProvider(context);
-	registerTaskProvider(context);
+	// registerCompletionProvider(context);
+	// registerFormatter(context);
+	// registerIntellisenseProvider(context);
+	// registerTaskProvider(context);
 	utils.loadEnv();
 }
 
@@ -116,8 +116,14 @@ function registerLinters(ctx: ExtensionContext) {
 		linters.run(e.document);
 	}
 
+	function executeLintingOnSave(d: vscode.TextDocument) {
+		if(!d) return;
+		linters.run(d);
+	}
+
 	ctx.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(executeLinting));
-	ctx.subscriptions.push(vscode.workspace.onDidChangeTextDocument(executeLinting));
+	// ctx.subscriptions.push(vscode.workspace.onDidChangeTextDocument(executeLinting));
+	ctx.subscriptions.push(vscode.workspace.onDidSaveTextDocument(executeLintingOnSave));
 	ctx.subscriptions.push(vscode.workspace.onDidChangeConfiguration(() => {
 		const docs = vscode.window.visibleTextEditors.map(editor => editor.document);
 		console.log("Config changed. Should lint:", docs.length);
